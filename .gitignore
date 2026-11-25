@@ -1,0 +1,28 @@
+# Dependencies and build output
+node_modules/
+dist/
+dist-ssr/
+*.local
+*.tsbuildinfo
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Logs
+*.log
+
+# OS and editors
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+.vscode/
+.idea/
+*.swp
+*.sw?
+*.suo
+*.sln
+*.njsproj
+*.ntvs*
