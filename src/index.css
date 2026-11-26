@@ -885,9 +885,10 @@ textarea {
 
 .donut {
   display: grid;
-  grid-template-columns: minmax(120px, 160px) 1fr;
+  grid-template-columns: minmax(120px, 160px) minmax(0, 300px);
+  justify-content: center;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
