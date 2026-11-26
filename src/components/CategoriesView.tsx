@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { newId } from '../store'
-import type { Category, Entry } from '../types'
+import { KINDS, type Category, type Entry, type Kind } from '../types'
 
 interface Props {
   categories: Category[]
@@ -41,6 +41,7 @@ export function CategoriesView({ categories, entries, onSave, onDelete }: Props)
         name: trimmed,
         color: NEW_COLORS[categories.length % NEW_COLORS.length],
         hidden: false,
+        kind: 'neutral',
         order: Math.max(-1, ...categories.map((c) => c.order)) + 1,
       })
       setName('')
@@ -51,8 +52,9 @@ export function CategoriesView({ categories, entries, onSave, onDelete }: Props)
     <section aria-label="Categories">
       <h2 className="section-title">Categories</h2>
       <p className="muted small">
-        Hidden categories stay on past entries but aren’t offered for new ones. A category can only be deleted
-        once no entries use it.
+        “Counts as” decides productive hours: a block counts as productive if any of its activities is
+        productive. Hidden categories stay on past entries but aren’t offered for new ones. A category can only be
+        deleted once no entries use it.
       </p>
 
       <ul className="category-list">
@@ -117,36 +119,57 @@ function CategoryRow({ category, count, isDuplicate, onSave, onDelete, onError }
 
   return (
     <li className={category.hidden ? 'category-row is-hidden' : 'category-row'}>
-      <input
-        type="color"
-        value={category.color}
-        onChange={(e) => void onSave({ ...category, color: e.target.value })}
-        aria-label={`Colour for ${category.name}`}
-      />
-      <input
-        type="text"
-        className="category-name"
-        value={name}
-        maxLength={40}
-        onChange={(e) => setName(e.target.value)}
-        onBlur={commitName}
-        onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-        aria-label="Category name"
-      />
-      <span className="muted small count">{count}</span>
-      <button type="button" className="small-button" onClick={() => void onSave({ ...category, hidden: !category.hidden })}>
-        {category.hidden ? 'Show' : 'Hide'}
-      </button>
-      <button
-        type="button"
-        className="small-button danger"
-        disabled={count > 0}
-        title={count > 0 ? `Used by ${count} entr${count === 1 ? 'y' : 'ies'}` : undefined}
-        onClick={() => confirm(`Delete “${category.name}”?`) && void onDelete()}
-        aria-label={`Delete ${category.name}`}
-      >
-        Delete
-      </button>
+      <div className="category-line">
+        <input
+          type="color"
+          value={category.color}
+          onChange={(e) => void onSave({ ...category, color: e.target.value })}
+          aria-label={`Colour for ${category.name}`}
+        />
+        <input
+          type="text"
+          className="category-name"
+          value={name}
+          maxLength={40}
+          onChange={(e) => setName(e.target.value)}
+          onBlur={commitName}
+          onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+          aria-label="Category name"
+        />
+        <span className="muted small count" title="Entries using this category">
+          {count}
+        </span>
+      </div>
+      <div className="category-line">
+        <label className="kind-select small">
+          <span className="muted">Counts as</span>
+          <select
+            value={category.kind}
+            onChange={(e) => void onSave({ ...category, kind: e.target.value as Kind })}
+            aria-label={`${category.name} counts as`}
+          >
+            {KINDS.map((k) => (
+              <option key={k} value={k}>
+                {k[0].toUpperCase() + k.slice(1)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <span className="spacer" />
+        <button type="button" className="small-button" onClick={() => void onSave({ ...category, hidden: !category.hidden })}>
+          {category.hidden ? 'Show' : 'Hide'}
+        </button>
+        <button
+          type="button"
+          className="small-button danger"
+          disabled={count > 0}
+          title={count > 0 ? `Used by ${count} entr${count === 1 ? 'y' : 'ies'}` : undefined}
+          onClick={() => confirm(`Delete “${category.name}”?`) && void onDelete()}
+          aria-label={`Delete ${category.name}`}
+        >
+          Delete
+        </button>
+      </div>
     </li>
   )
 }

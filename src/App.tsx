@@ -1,13 +1,15 @@
 import { useState } from 'react'
+import { BackupReminder } from './components/BackupReminder'
 import { BackupView } from './components/BackupView'
 import { CategoriesView } from './components/CategoriesView'
 import { DayView } from './components/DayView'
 import { EntryForm } from './components/EntryForm'
+import { WeekView } from './components/WeekView'
 import { useTrackerData } from './store'
 import { toISODate } from './time'
 import type { Entry } from './types'
 
-type Tab = 'day' | 'categories' | 'backup'
+type Tab = 'day' | 'week' | 'categories' | 'backup'
 
 export default function App() {
   const { data, error, saveEntry, deleteEntry, saveCategory, deleteCategory, applyImport, markBackedUp } =
@@ -24,6 +26,13 @@ export default function App() {
       </header>
 
       <main className="content">
+        {data && (tab === 'day' || tab === 'week') && (
+          <BackupReminder
+            lastBackup={data.lastBackup}
+            entryCount={data.entries.length}
+            onBackUp={() => setTab('backup')}
+          />
+        )}
         {error ? (
           <p className="error" role="alert">
             Couldn’t open your saved data: {error}
@@ -32,6 +41,17 @@ export default function App() {
           <p className="muted">Loading…</p>
         ) : tab === 'day' ? (
           <DayView day={day} setDay={setDay} categories={data.categories} entries={data.entries} onEdit={setEditing} />
+        ) : tab === 'week' ? (
+          <WeekView
+            day={day}
+            setDay={setDay}
+            categories={data.categories}
+            entries={data.entries}
+            openDay={(d) => {
+              setDay(d)
+              setTab('day')
+            }}
+          />
         ) : tab === 'backup' ? (
           <BackupView data={data} onImport={applyImport} onExported={markBackedUp} />
         ) : (
@@ -54,6 +74,7 @@ export default function App() {
         {(
           [
             ['day', 'Day'],
+            ['week', 'Week'],
             ['categories', 'Categories'],
             ['backup', 'Backup'],
           ] as const

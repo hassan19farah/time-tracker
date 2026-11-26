@@ -1,5 +1,6 @@
-import { useEffect, useState, type CSSProperties } from 'react'
-import { addDays, dayLabel, formatDuration, minutesByCategory, MINUTES_PER_DAY, toISODate } from '../time'
+import type { CSSProperties } from 'react'
+import { useToday } from '../useToday'
+import { addDays, dayLabel, formatDuration, minutesByCategory, minutesByKind, MINUTES_PER_DAY } from '../time'
 import type { Category, Entry } from '../types'
 
 interface Props {
@@ -26,22 +27,13 @@ function stripe(cats: (Category | undefined)[]): string {
   return `linear-gradient(${colors.map((c, i) => `${c} ${i * step}% ${(i + 1) * step}%`).join(', ')})`
 }
 
-/** Today's date, refreshed every minute so "Today" stays right past midnight. */
-function useToday(): string {
-  const [today, setToday] = useState(() => toISODate(new Date()))
-  useEffect(() => {
-    const timer = setInterval(() => setToday(toISODate(new Date())), 60_000)
-    return () => clearInterval(timer)
-  }, [])
-  return today
-}
-
 export function DayView({ day, setDay, categories, entries, onEdit }: Props) {
   const byId = new Map(categories.map((c) => [c.id, c]))
   const dayEntries = entries.filter((e) => e.date === day).sort(sortForDay)
   const total = dayEntries.reduce((sum, e) => sum + e.minutes, 0)
   const today = useToday()
 
+  const productive = minutesByKind(dayEntries, (id) => byId.get(id)?.kind).productive
   const breakdown = [...minutesByCategory(dayEntries)].sort((a, b) => b[1] - a[1])
 
   return (
@@ -72,6 +64,12 @@ export function DayView({ day, setDay, categories, entries, onEdit }: Props) {
       <div className="day-summary">
         <p>
           <strong>{formatDuration(total)}</strong> logged
+          {total > 0 && (
+            <>
+              {' · '}
+              <strong>{formatDuration(productive)}</strong> productive
+            </>
+          )}
           {total < MINUTES_PER_DAY && total > 0 && (
             <span className="muted"> · {formatDuration(MINUTES_PER_DAY - total)} unlogged</span>
           )}

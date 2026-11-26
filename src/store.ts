@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { MergePlan } from './backup'
 import { getAll, getMeta, putBatch, putMany, remove, requestPersistence, setMeta } from './db'
-import type { Category, Entry } from './types'
+import type { Category, Entry, Kind } from './types'
 
 export interface TrackerData {
   categories: Category[]
@@ -19,38 +19,40 @@ export function newId(): string {
 }
 
 // Generic on purpose: personal categories are added on the device, never in the code.
-const STARTER_CATEGORIES: [name: string, color: string][] = [
-  ['Sleep', '#6366f1'],
-  ['Work', '#2563eb'],
-  ['Study', '#0d9488'],
-  ['Projects', '#0284c7'],
-  ['Exercise', '#65a30d'],
-  ['Meals', '#ea580c'],
-  ['Leisure', '#db2777'],
-  ['Family', '#e11d48'],
-  ['Social', '#9333ea'],
-  ['Travel', '#0891b2'],
-  ['Errands', '#78716c'],
-  ['Self-care', '#ca8a04'],
+const STARTER_CATEGORIES: [name: string, color: string, kind: Kind][] = [
+  ['Sleep', '#6366f1', 'rest'],
+  ['Work', '#2563eb', 'productive'],
+  ['Study', '#0d9488', 'productive'],
+  ['Projects', '#0284c7', 'productive'],
+  ['Exercise', '#65a30d', 'productive'],
+  ['Meals', '#ea580c', 'neutral'],
+  ['Leisure', '#db2777', 'rest'],
+  ['Family', '#e11d48', 'neutral'],
+  ['Social', '#9333ea', 'neutral'],
+  ['Travel', '#0891b2', 'neutral'],
+  ['Errands', '#78716c', 'neutral'],
+  ['Self-care', '#ca8a04', 'neutral'],
 ]
 
 function starterCategories(): Category[] {
-  return STARTER_CATEGORIES.map(([name, color], order) => ({
+  return STARTER_CATEGORIES.map(([name, color, kind], order) => ({
     id: newId(),
     name,
     color,
     hidden: false,
     order,
+    kind,
   }))
 }
 
 async function loadData(): Promise<TrackerData> {
-  const [categories, entries, seeded, lastBackup = null] = await Promise.all([
+  const [storedCategories, entries, seeded, lastBackup = null] = await Promise.all([
     getAll<Category>('categories'),
     getAll<Entry>('entries'),
     getMeta<boolean>('seeded'),
     getMeta<string>('lastBackup'),
   ])
+  const categories = storedCategories.map((c) => ({ ...c, kind: c.kind ?? 'neutral' }))
   // Seed starter categories once only, so deleting them all doesn't bring them back.
   if (!seeded && categories.length === 0) {
     const starters = starterCategories()

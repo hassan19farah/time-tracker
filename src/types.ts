@@ -1,3 +1,7 @@
+export type Kind = 'productive' | 'neutral' | 'rest'
+
+export const KINDS: Kind[] = ['productive', 'neutral', 'rest']
+
 export interface Category {
   id: string
   name: string
@@ -6,6 +10,8 @@ export interface Category {
   /** Hidden categories stay on old entries but aren't offered for new ones. */
   hidden: boolean
   order: number
+  /** How time on this counts in "productive hours". Older data without it reads as neutral. */
+  kind: Kind
 }
 
 export interface Entry {

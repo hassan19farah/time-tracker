@@ -125,3 +125,31 @@ export function minutesByCategory(entries: { minutes: number; categoryIds: strin
   }
   return totals
 }
+
+/** Monday of the week containing iso. */
+export function startOfWeek(iso: string): string {
+  const day = parseISODate(iso).getDay() // 0 = Sunday
+  return addDays(iso, -((day + 6) % 7))
+}
+
+type KindName = 'productive' | 'neutral' | 'rest'
+
+/**
+ * What a block counts as: productive if any of its activities is productive
+ * (prayer + tech project = a productive hour), else neutral if any is neutral, else rest.
+ */
+export function blockKind(categoryIds: string[], kindOf: (id: string) => KindName | undefined): KindName {
+  const kinds = categoryIds.map(kindOf)
+  if (kinds.includes('productive')) return 'productive'
+  if (kinds.includes('neutral') || kinds.includes(undefined)) return 'neutral'
+  return 'rest'
+}
+
+export function minutesByKind(
+  entries: { minutes: number; categoryIds: string[] }[],
+  kindOf: (id: string) => KindName | undefined,
+): Record<KindName, number> {
+  const totals = { productive: 0, neutral: 0, rest: 0 }
+  for (const e of entries) totals[blockKind(e.categoryIds, kindOf)] += e.minutes
+  return totals
+}
