@@ -54,6 +54,12 @@ export function Donut({ totals }: Props) {
         </text>
       </svg>
       <ul className="donut-legend">
+        <li className="dl-head" aria-hidden="true">
+          <span />
+          <span>Out of {formatDuration(Math.round(logged))} logged</span>
+          <span>Hours</span>
+          <span>Share</span>
+        </li>
         {KINDS.map((k) => (
           <li key={k}>
             <span className={`swatch kind-${k}`} aria-hidden="true" />
