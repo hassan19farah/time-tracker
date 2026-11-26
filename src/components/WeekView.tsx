@@ -27,12 +27,11 @@ const longDay = (iso: string) =>
   parseISODate(iso).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' })
 
 function weekLabel(monday: string): string {
-  const sunday = parseISODate(addDays(monday, 6))
-  const first = parseISODate(monday)
-  const sameMonth = first.getMonth() === sunday.getMonth()
-  const end = sunday.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
-  const start = first.toLocaleDateString(undefined, sameMonth ? { day: 'numeric' } : { day: 'numeric', month: 'short' })
-  return `${start} – ${end}`
+  // formatRange gives "Nov 23 – 29" or "23–29 Nov" depending on the phone's language.
+  return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' }).formatRange(
+    parseISODate(monday),
+    parseISODate(addDays(monday, 6)),
+  )
 }
 
 export function WeekView({ day, setDay, categories, entries, openDay }: Props) {
@@ -164,9 +163,18 @@ export function WeekView({ day, setDay, categories, entries, openDay }: Props) {
                 </span>
                 <span className="week-day">
                   {shortDay(d.date)}
-                  <span className="muted"> {dayNum(d.date)}</span>
+                  <br />
+                  <span className="muted">{dayNum(d.date)}</span>
                 </span>
-                <span className="week-value">{d.kinds.productive ? `${hours(d.kinds.productive)} prod.` : '–'}</span>
+                <span className="week-value">{d.kinds.productive ? (
+                    <>
+                      {hours(d.kinds.productive)}
+                      <br />
+                      prod.
+                    </>
+                  ) : (
+                    '–'
+                  )}</span>
               </button>
             ))}
           </div>
@@ -174,6 +182,7 @@ export function WeekView({ day, setDay, categories, entries, openDay }: Props) {
 
           <details className="table-toggle">
             <summary>Show as table</summary>
+            <div className="table-scroll">
             <table className="data-table">
               <thead>
                 <tr>
@@ -209,6 +218,7 @@ export function WeekView({ day, setDay, categories, entries, openDay }: Props) {
                 </tr>
               </tfoot>
             </table>
+            </div>
           </details>
 
           <h3 className="chart-title">By category</h3>

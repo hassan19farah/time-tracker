@@ -2,6 +2,17 @@
 
 See where your day goes. Log what you did in each block of time, and see how many hours were productive, necessary, unproductive or rest.
 
+<p align="center">
+  <img src="docs/screenshots/day.png" alt="Day view: entries with times, categories and notes" width="220">
+  <img src="docs/screenshots/week.png" alt="Week view: productive, unproductive and logged hours with a donut chart" width="220">
+  <img src="docs/screenshots/week-days.png" alt="Week view: each day split into productive, necessary, unproductive and rest" width="220">
+</p>
+<p align="center">
+  <img src="docs/screenshots/entry.png" alt="Editing an entry: time, categories, tags and note" width="220">
+  <img src="docs/screenshots/week-dark.png" alt="Week view in dark mode" width="220">
+</p>
+<p align="center"><sub>Screenshots use made-up demo data.</sub></p>
+
 ## Features
 
 - Log time with a start and end (or just a duration), one or more categories, tags and a note

@@ -138,6 +138,8 @@ textarea {
 
 .tab-bar button {
   flex: 1;
+  min-width: 0;
+  padding: 0 4px;
   max-width: 20rem;
   height: var(--tab-height);
   border: 0;
@@ -554,12 +556,15 @@ textarea {
 
 .category-line {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .category-line .category-name {
   flex: 1;
+  min-width: 0;
 }
 
 .kind-select {
@@ -754,8 +759,8 @@ textarea {
 
 .week-chart {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
 }
 
 .week-col {
@@ -792,7 +797,8 @@ textarea {
 
 .week-day {
   font-size: 0.8rem;
-  white-space: nowrap;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .week-col.is-today .week-day {
@@ -800,7 +806,9 @@ textarea {
 }
 
 .week-value {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  text-align: center;
+  line-height: 1.2;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
@@ -816,6 +824,11 @@ textarea {
   min-height: 32px;
   display: flex;
   align-items: center;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .data-table {
@@ -917,6 +930,7 @@ textarea {
 }
 
 .donut-legend {
+  min-width: 0;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -956,7 +970,8 @@ textarea {
   text-align: right;
 }
 
-@media (max-width: 360px) {
+/* Phones: ring on top, key underneath, so nothing is wider than the screen. */
+@media (max-width: 520px) {
   .donut {
     grid-template-columns: 1fr;
     justify-items: center;
