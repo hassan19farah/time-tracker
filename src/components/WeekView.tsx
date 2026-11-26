@@ -10,6 +10,7 @@ import {
 } from '../time'
 import { useToday } from '../useToday'
 import { KIND_LABEL, KINDS, type Category, type Entry } from '../types'
+import { Donut } from './Donut'
 
 interface Props {
   day: string
@@ -103,6 +104,9 @@ export function WeekView({ day, setDay, categories, entries, openDay }: Props) {
         <p className="empty">Nothing logged this week yet.</p>
       ) : (
         <>
+          <h3 className="chart-title">Share of logged time</h3>
+          <Donut totals={totals} />
+
           <h3 className="chart-title">Each day</h3>
           <ul className="legend" aria-label="Legend">
             {KINDS.map((k) => (
