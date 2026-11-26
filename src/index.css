@@ -616,21 +616,22 @@ textarea {
 }
 
 
-/* Groups: validated categorical slots (blue, aqua, orange, violet) in stack order, stepped per theme.
-   Light aqua/orange are under 3:1 on white, so the chart always has a legend, labels and a table. */
+/* Groups: blue, teal, red, yellow in stack order, stepped per theme; validated for colour-blind
+   separation in both themes. Light teal/yellow are under 3:1 on white, so the chart always has
+   a legend, labels and a table. */
 :root {
   --kind-productive: #257de0;
   --kind-necessary: #00b894;
-  --kind-unproductive: #f47230;
-  --kind-rest: #6a4ce2;
+  --kind-unproductive: #ec4647;
+  --kind-rest: #f2a600;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --kind-productive: #338ced;
     --kind-necessary: #00a888;
-    --kind-unproductive: #e76624;
-    --kind-rest: #9887ef;
+    --kind-unproductive: #e5484d;
+    --kind-rest: #d28e05;
   }
 }
 
