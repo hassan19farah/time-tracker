@@ -162,11 +162,11 @@ export function WeekView({ day, setDay, categories, entries, openDay }: Props) {
                   {shortDay(d.date)}
                   <span className="muted"> {dayNum(d.date)}</span>
                 </span>
-                <span className="week-value">{d.kinds.productive ? hours(d.kinds.productive) : '–'}</span>
+                <span className="week-value">{d.kinds.productive ? `${hours(d.kinds.productive)} prod.` : '–'}</span>
               </button>
             ))}
           </div>
-          <p className="muted small center">Column height = 24 hours. Number below = productive time.</p>
+          <p className="muted small center">Column height = 24 hours. “prod.” = productive time that day.</p>
 
           <details className="table-toggle">
             <summary>Show as table</summary>

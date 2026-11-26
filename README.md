@@ -1,10 +1,21 @@
 # Time Tracker
 
-A simple time tracker that runs entirely in your browser. **Status: setup only, no features yet.**
+See where your day goes. Log what you did in each block of time, and see how many hours were productive, necessary, unproductive or rest.
+
+## Features
+
+- Log time with a start and end (or just a duration), one or more categories, tags and a note
+- An hour can hold several activities: "prayer + project" counts as a productive hour
+- Day view with totals, and a week view with charts and a table
+- Your own categories, each counting as productive, necessary, unproductive or rest
+- Export a backup file and import it again, on this or another device
+- Works on phone and desktop, installs to your home screen and works offline
 
 ## Privacy first
 
-Your data will never leave your device. There is no backend, no database, no account and no API keys. Entries will be stored in your own browser.
+Your data never leaves your device. There is no backend, no database, no account and no tracking. Entries are stored in your own browser (IndexedDB).
+
+Because of that, **clearing your browser data deletes your entries**, and your phone and computer don't share data. Use **Backup → Download backup** regularly, and import the file to move data between devices.
 
 ## Run locally
 
