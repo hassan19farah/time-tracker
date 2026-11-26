@@ -1,7 +1,7 @@
 // Backup files: a JSON copy of all categories and entries that can be imported again,
 // on this device or another one.
-import { MINUTES_PER_DAY, minutesBetween, parseTime } from './time'
-import { normalizeKind, type Category, type Entry } from './types'
+import { MINUTES_PER_DAY, minutesBetween, parseTime } from './time.ts'
+import { normalizeKind, type Category, type Entry } from './types.ts'
 
 export const BACKUP_APP = 'time-tracker'
 export const BACKUP_VERSION = 1
