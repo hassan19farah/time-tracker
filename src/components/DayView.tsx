@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react'
 import { useToday } from '../useToday'
-import { addDays, dayLabel, formatDuration, minutesByCategory, minutesByKind, MINUTES_PER_DAY } from '../time'
+import { addDays, dayLabel, formatDuration, minutesByCategory, minutesByKind, parseISODate } from '../time'
+import { PeriodNav } from './PeriodNav'
+import { StatTiles } from './StatTiles'
 import type { Category, Entry } from '../types'
 
 interface Props {
@@ -34,48 +36,42 @@ export function DayView({ day, setDay, categories, entries, onEdit }: Props) {
   const today = useToday()
 
   const kinds = minutesByKind(dayEntries, (id) => byId.get(id)?.kind)
+  const pct = (m: number) => (total ? `${Math.round((m / total) * 100)}%` : undefined)
   const breakdown = [...minutesByCategory(dayEntries)].sort((a, b) => b[1] - a[1])
 
   return (
     <section aria-label="Day">
-      <div className="day-nav">
-        <button type="button" className="icon-button" onClick={() => setDay(addDays(day, -1))} aria-label="Previous day">
-          ‹
-        </button>
-        <label className="day-picker">
-          <span className="day-label">{dayLabel(day, today)}</span>
-          <input
-            type="date"
-            value={day}
-            onChange={(e) => e.target.value && setDay(e.target.value)}
-            aria-label="Pick a date"
-          />
-        </label>
-        <button type="button" className="icon-button" onClick={() => setDay(addDays(day, 1))} aria-label="Next day">
-          ›
-        </button>
-      </div>
-      {day !== today && (
-        <button type="button" className="link-button today-button" onClick={() => setDay(today)}>
-          Back to today
-        </button>
-      )}
+      <PeriodNav
+        title={dayLabel(day, today)}
+        subtitle={parseISODate(day).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
+        prevLabel="Previous day"
+        nextLabel="Next day"
+        onPrev={() => setDay(addDays(day, -1))}
+        onNext={() => setDay(addDays(day, 1))}
+        backLabel={day !== today ? 'Back to today' : undefined}
+        onBack={() => setDay(today)}
+        renderTitle={(title) => (
+          <label className="day-picker">
+            {title}
+            <input
+              type="date"
+              value={day}
+              onChange={(e) => e.target.value && setDay(e.target.value)}
+              aria-label="Pick a date"
+            />
+          </label>
+        )}
+      />
+
+      <StatTiles
+        stats={[
+          { label: 'Productive', value: formatDuration(kinds.productive), detail: pct(kinds.productive) },
+          { label: 'Unproductive', value: formatDuration(kinds.unproductive), detail: pct(kinds.unproductive) },
+          { label: 'Logged', value: formatDuration(total), detail: 'of 24h' },
+        ]}
+      />
 
       <div className="day-summary">
-        <p>
-          <strong>{formatDuration(total)}</strong> logged
-          {total > 0 && (
-            <>
-              {' · '}
-              <strong>{formatDuration(kinds.productive)}</strong> productive
-              {' · '}
-              <strong>{formatDuration(kinds.unproductive)}</strong> unproductive
-            </>
-          )}
-          {total < MINUTES_PER_DAY && total > 0 && (
-            <span className="muted"> · {formatDuration(MINUTES_PER_DAY - total)} unlogged</span>
-          )}
-        </p>
         {breakdown.length > 0 && (
           <div className="stack-bar" role="img" aria-label={breakdown.map(([id, m]) => `${byId.get(id)?.name ?? 'Unknown'} ${formatDuration(Math.round(m))}`).join(', ')}>
             {breakdown.map(([id, m]) => (

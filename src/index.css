@@ -15,6 +15,11 @@
   --warning-bg: #fff4d6;
   --warning-text: #6b4e00;
   --radius: 12px;
+  /* Spacing scale: use these between blocks so every tab has the same rhythm. */
+  --space-xs: 4px;
+  --space-s: 8px;
+  --space-m: 12px;
+  --space-l: 20px;
   --tab-height: 56px;
 }
 
@@ -122,7 +127,7 @@ textarea {
 
 .section-title {
   font-size: 1.1rem;
-  margin: 8px 0 4px;
+  margin: var(--space-s) 0 var(--space-xs);
 }
 
 .tab-bar {
@@ -166,12 +171,29 @@ textarea {
 
 /* Day view */
 
+.period-nav {
+  margin-top: var(--space-s);
+}
+
 .day-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-top: 8px;
+  gap: var(--space-s);
+}
+
+.nav-sub {
+  margin: var(--space-xs) 0 0;
+  min-height: 1.5em;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.link-button.inline {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  font-size: inherit;
 }
 
 .icon-button {
@@ -208,17 +230,8 @@ textarea {
   min-height: 32px;
 }
 
-.today-button {
-  display: block;
-  margin: 0 auto;
-}
-
 .day-summary {
-  margin: 12px 0;
-}
-
-.day-summary p {
-  margin: 0 0 8px;
+  margin: var(--space-m) 0 var(--space-l);
 }
 
 .stack-bar {
@@ -664,7 +677,7 @@ textarea {
   color: var(--warning-text);
   border-radius: var(--radius);
   padding: 10px 12px;
-  margin: 8px 0;
+  margin: var(--space-s) 0 0;
   font-size: 0.9rem;
 }
 
@@ -680,13 +693,15 @@ textarea {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin: 12px 0 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-s);
+  margin: var(--space-m) 0 0;
 }
 
 .stat {
   display: grid;
+  gap: 2px;
+  min-width: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -699,19 +714,25 @@ textarea {
 }
 
 .stat-value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 6px;
   font-size: 1.35rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  line-height: 1.2;
 }
 
-.stat-sub {
+.stat-detail {
   font-size: 0.8rem;
+  font-weight: 500;
   color: var(--muted);
 }
 
 .chart-title {
   font-size: 1rem;
-  margin: 20px 0 6px;
+  margin: var(--space-l) 0 var(--space-s);
 }
 
 .legend {

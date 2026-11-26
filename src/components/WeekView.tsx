@@ -11,6 +11,8 @@ import {
 import { useToday } from '../useToday'
 import { KIND_LABEL, KINDS, type Category, type Entry } from '../types'
 import { Donut } from './Donut'
+import { PeriodNav } from './PeriodNav'
+import { StatTiles } from './StatTiles'
 
 interface Props {
   day: string
@@ -55,6 +57,7 @@ export function WeekView({ day, setDay, categories, entries, openDay }: Props) {
   const logged = KINDS.reduce((sum, k) => sum + totals[k], 0)
   const daysLogged = perDay.filter((d) => d.logged > 0).length
 
+  const pct = (m: number) => (logged ? `${Math.round((m / logged) * 100)}%` : undefined)
   const perCategory = [...minutesByCategory(weekEntries)].sort((a, b) => b[1] - a[1])
   const maxCategory = perCategory[0]?.[1] ?? 0
 
@@ -62,42 +65,36 @@ export function WeekView({ day, setDay, categories, entries, openDay }: Props) {
 
   return (
     <section aria-label="Week">
-      <div className="day-nav">
-        <button type="button" className="icon-button" onClick={() => setDay(addDays(monday, -7))} aria-label="Previous week">
-          ‹
-        </button>
-        <span className="day-label">{monday === thisMonday ? 'This week' : weekLabel(monday)}</span>
-        <button type="button" className="icon-button" onClick={() => setDay(addDays(monday, 7))} aria-label="Next week">
-          ›
-        </button>
-      </div>
-      {monday !== thisMonday ? (
-        <button type="button" className="link-button today-button" onClick={() => setDay(today)}>
-          Back to this week
-        </button>
-      ) : (
-        <p className="muted small center">{weekLabel(monday)}</p>
-      )}
+      <PeriodNav
+        title={
+          monday === thisMonday
+            ? 'This week'
+            : monday === addDays(thisMonday, -7)
+              ? 'Last week'
+              : monday === addDays(thisMonday, 7)
+                ? 'Next week'
+                : weekLabel(monday)
+        }
+        subtitle={
+          [thisMonday, addDays(thisMonday, -7), addDays(thisMonday, 7)].includes(monday)
+            ? weekLabel(monday)
+            : monday.slice(0, 4)
+        }
+        prevLabel="Previous week"
+        nextLabel="Next week"
+        onPrev={() => setDay(addDays(monday, -7))}
+        onNext={() => setDay(addDays(monday, 7))}
+        backLabel={monday !== thisMonday ? 'Back to this week' : undefined}
+        onBack={() => setDay(today)}
+      />
 
-      <div className="stats">
-        <div className="stat">
-          <span className="stat-label">Productive</span>
-          <span className="stat-value">{hours(totals.productive)}</span>
-          <span className="stat-sub">{logged ? `${Math.round((totals.productive / logged) * 100)}% of logged time` : '—'}</span>
-        </div>
-        <div className="stat">
-          <span className="stat-label">Unproductive</span>
-          <span className="stat-value">{hours(totals.unproductive)}</span>
-          <span className="stat-sub">{logged ? `${Math.round((totals.unproductive / logged) * 100)}% of logged time` : '—'}</span>
-        </div>
-        <div className="stat">
-          <span className="stat-label">Logged</span>
-          <span className="stat-value">{hours(logged)}</span>
-          <span className="stat-sub">
-            {daysLogged} of 7 days
-          </span>
-        </div>
-      </div>
+      <StatTiles
+        stats={[
+          { label: 'Productive', value: hours(totals.productive), detail: pct(totals.productive) },
+          { label: 'Unproductive', value: hours(totals.unproductive), detail: pct(totals.unproductive) },
+          { label: 'Logged', value: hours(logged), detail: `${daysLogged}/7 days` },
+        ]}
+      />
 
       {logged === 0 ? (
         <p className="empty">Nothing logged this week yet.</p>
