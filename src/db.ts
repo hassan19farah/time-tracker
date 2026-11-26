@@ -78,6 +78,21 @@ export async function putBatch(writes: { store: StoreName; values: unknown[] }[]
   )
 }
 
+/** Empties the stores, then writes the new values, in one transaction: all or nothing. */
+export async function replaceStores(writes: { store: StoreName; values: unknown[] }[]): Promise<void> {
+  await withStores(
+    writes.map((w) => w.store),
+    'readwrite',
+    (tx) => {
+      for (const w of writes) {
+        const os = tx.objectStore(w.store)
+        os.clear()
+        for (const v of w.values) os.put(v)
+      }
+    },
+  )
+}
+
 export async function remove(store: StoreName, id: string): Promise<void> {
   await withStores([store], 'readwrite', (tx) => {
     tx.objectStore(store).delete(id)

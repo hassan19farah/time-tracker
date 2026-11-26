@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { MergePlan } from './backup'
-import { getAll, getMeta, putBatch, putMany, remove, requestPersistence, setMeta } from './db'
+import type { BackupFile, MergePlan } from './backup'
+import { getAll, getMeta, putBatch, putMany, remove, replaceStores, requestPersistence, setMeta } from './db'
 import type { Category, Entry, Kind } from './types'
 
 export interface TrackerData {
@@ -131,11 +131,19 @@ export function useTrackerData() {
     })
   }, [])
 
+  const replaceAll = useCallback(async (backup: BackupFile) => {
+    await replaceStores([
+      { store: 'categories', values: backup.categories },
+      { store: 'entries', values: backup.entries },
+    ])
+    setData((d) => d && { ...d, categories: backup.categories, entries: backup.entries })
+  }, [])
+
   const markBackedUp = useCallback(async () => {
     const now = new Date().toISOString()
     await setMeta('lastBackup', now)
     setData((d) => d && { ...d, lastBackup: now })
   }, [])
 
-  return { data, error, saveEntry, deleteEntry, saveCategory, deleteCategory, applyImport, markBackedUp }
+  return { data, error, saveEntry, deleteEntry, saveCategory, deleteCategory, applyImport, replaceAll, markBackedUp }
 }

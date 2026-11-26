@@ -1,16 +1,17 @@
 import { useRef, useState, type ChangeEvent } from 'react'
-import { backupFileName, makeBackup, parseBackup, planMerge, type MergePlan } from '../backup'
+import { backupFileName, makeBackup, parseBackup, planMerge, type BackupFile, type MergePlan } from '../backup'
 import type { TrackerData } from '../store'
 
 interface Props {
   data: TrackerData
   onImport: (plan: MergePlan) => Promise<void>
+  onReplace: (backup: BackupFile) => Promise<void>
   onExported: () => Promise<void>
 }
 
-export function BackupView({ data, onImport, onExported }: Props) {
+export function BackupView({ data, onImport, onReplace, onExported }: Props) {
   const fileInput = useRef<HTMLInputElement>(null)
-  const [pending, setPending] = useState<{ name: string; plan: MergePlan } | null>(null)
+  const [pending, setPending] = useState<{ name: string; backup: BackupFile; plan: MergePlan } | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -44,7 +45,7 @@ export function BackupView({ data, onImport, onExported }: Props) {
     try {
       if (file.size > 20 * 1024 * 1024) throw new Error('That file is too large to be a Time Tracker backup.')
       const backup = parseBackup(await file.text())
-      setPending({ name: file.name, plan: planMerge(data, backup) })
+      setPending({ name: file.name, backup, plan: planMerge(data, backup) })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not read that file.')
     }
@@ -60,6 +61,27 @@ export function BackupView({ data, onImport, onExported }: Props) {
       setPending(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Import failed. Nothing was changed.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function confirmReplace() {
+    if (!pending) return
+    const { backup } = pending
+    if (
+      !confirm(
+        `Replace everything in this app with ${pending.name}?\n\nYour current ${data.entries.length} entries and ${data.categories.length} categories will be deleted and replaced by the file’s ${backup.entries.length} entries and ${backup.categories.length} categories.`,
+      )
+    )
+      return
+    setBusy(true)
+    try {
+      await onReplace(backup)
+      setMessage(`Replaced: now ${backup.entries.length} entries and ${backup.categories.length} categories.`)
+      setPending(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Replace failed. Nothing was changed.')
     } finally {
       setBusy(false)
     }
@@ -92,7 +114,8 @@ export function BackupView({ data, onImport, onExported }: Props) {
       <div className="card">
         <h3>Import</h3>
         <p className="small muted">
-          Adds entries from a backup file. Nothing is deleted. Categories with the same name are combined.
+          <strong>Add</strong> merges a backup into what’s here: nothing is deleted and existing categories are kept.{' '}
+          <strong>Replace everything</strong> makes the app an exact copy of the file.
         </p>
         <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={chooseFile} />
         <button type="button" onClick={() => fileInput.current?.click()} disabled={busy}>
@@ -111,13 +134,17 @@ export function BackupView({ data, onImport, onExported }: Props) {
               <button type="button" onClick={() => setPending(null)} disabled={busy}>
                 Cancel
               </button>
+              <span className="spacer" />
+              <button type="button" className="danger" onClick={confirmReplace} disabled={busy}>
+                Replace everything
+              </button>
               <button
                 type="button"
                 className="primary"
                 onClick={confirmImport}
                 disabled={busy || pending.plan.entries.length + pending.plan.categories.length === 0}
               >
-                Import
+                Add
               </button>
             </div>
           </div>

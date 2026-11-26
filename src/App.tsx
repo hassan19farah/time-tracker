@@ -12,7 +12,7 @@ import type { Entry } from './types'
 type Tab = 'day' | 'week' | 'categories' | 'backup'
 
 export default function App() {
-  const { data, error, saveEntry, deleteEntry, saveCategory, deleteCategory, applyImport, markBackedUp } =
+  const { data, error, saveEntry, deleteEntry, saveCategory, deleteCategory, applyImport, replaceAll, markBackedUp } =
     useTrackerData()
   const [tab, setTab] = useState<Tab>('day')
   const [day, setDay] = useState(() => toISODate(new Date()))
@@ -53,7 +53,7 @@ export default function App() {
             }}
           />
         ) : tab === 'backup' ? (
-          <BackupView data={data} onImport={applyImport} onExported={markBackedUp} />
+          <BackupView data={data} onImport={applyImport} onReplace={replaceAll} onExported={markBackedUp} />
         ) : (
           <CategoriesView
             categories={data.categories}
