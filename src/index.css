@@ -616,26 +616,32 @@ textarea {
 }
 
 
-/* Productive / neutral / rest: validated categorical slots 1-3, stepped per theme. */
+/* Groups: validated categorical slots (blue, aqua, orange, violet) in stack order, stepped per theme.
+   Light aqua/orange are under 3:1 on white, so the chart always has a legend, labels and a table. */
 :root {
   --kind-productive: #257de0;
-  --kind-neutral: #f47230;
-  --kind-rest: #00b894;
+  --kind-necessary: #00b894;
+  --kind-unproductive: #f47230;
+  --kind-rest: #6a4ce2;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --kind-productive: #338ced;
-    --kind-neutral: #e76624;
-    --kind-rest: #00a888;
+    --kind-necessary: #00a888;
+    --kind-unproductive: #e76624;
+    --kind-rest: #9887ef;
   }
 }
 
 .kind-productive {
   background: var(--kind-productive);
 }
-.kind-neutral {
-  background: var(--kind-neutral);
+.kind-necessary {
+  background: var(--kind-necessary);
+}
+.kind-unproductive {
+  background: var(--kind-unproductive);
 }
 .kind-rest {
   background: var(--kind-rest);
@@ -668,7 +674,7 @@ textarea {
 
 .stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin: 12px 0 16px;
 }
@@ -687,7 +693,7 @@ textarea {
 }
 
 .stat-value {
-  font-size: 1.6rem;
+  font-size: 1.35rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }

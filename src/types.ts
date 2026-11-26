@@ -1,6 +1,20 @@
-export type Kind = 'productive' | 'neutral' | 'rest'
+export type Kind = 'productive' | 'necessary' | 'unproductive' | 'rest'
 
-export const KINDS: Kind[] = ['productive', 'neutral', 'rest']
+/** Also the order the groups are stacked and listed in. */
+export const KINDS: Kind[] = ['productive', 'necessary', 'unproductive', 'rest']
+
+export const KIND_LABEL: Record<Kind, string> = {
+  productive: 'Productive',
+  necessary: 'Necessary',
+  unproductive: 'Unproductive',
+  rest: 'Rest',
+}
+
+/** Reads groups from stored data or backups. Early versions used "neutral" for necessary. */
+export function normalizeKind(value: unknown): Kind {
+  if (value === 'neutral') return 'necessary'
+  return KINDS.includes(value as Kind) ? (value as Kind) : 'necessary'
+}
 
 export interface Category {
   id: string
@@ -10,7 +24,7 @@ export interface Category {
   /** Hidden categories stay on old entries but aren't offered for new ones. */
   hidden: boolean
   order: number
-  /** How time on this counts in "productive hours". Older data without it reads as neutral. */
+  /** Which group time on this counts towards (productive, necessary, unproductive or rest). */
   kind: Kind
 }
 

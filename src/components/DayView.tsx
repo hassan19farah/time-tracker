@@ -33,7 +33,7 @@ export function DayView({ day, setDay, categories, entries, onEdit }: Props) {
   const total = dayEntries.reduce((sum, e) => sum + e.minutes, 0)
   const today = useToday()
 
-  const productive = minutesByKind(dayEntries, (id) => byId.get(id)?.kind).productive
+  const kinds = minutesByKind(dayEntries, (id) => byId.get(id)?.kind)
   const breakdown = [...minutesByCategory(dayEntries)].sort((a, b) => b[1] - a[1])
 
   return (
@@ -67,7 +67,9 @@ export function DayView({ day, setDay, categories, entries, onEdit }: Props) {
           {total > 0 && (
             <>
               {' · '}
-              <strong>{formatDuration(productive)}</strong> productive
+              <strong>{formatDuration(kinds.productive)}</strong> productive
+              {' · '}
+              <strong>{formatDuration(kinds.unproductive)}</strong> unproductive
             </>
           )}
           {total < MINUTES_PER_DAY && total > 0 && (

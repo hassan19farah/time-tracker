@@ -132,16 +132,20 @@ export function startOfWeek(iso: string): string {
   return addDays(iso, -((day + 6) % 7))
 }
 
-type KindName = 'productive' | 'neutral' | 'rest'
+type KindName = 'productive' | 'necessary' | 'unproductive' | 'rest'
 
 /**
- * What a block counts as: productive if any of its activities is productive
- * (prayer + tech project = a productive hour), else neutral if any is neutral, else rest.
+ * What a block counts as, by the owner's rule:
+ * anything productive -> productive (prayer + tech project = a productive hour);
+ * else anything unproductive -> unproductive (lunch + Netflix: that's where time slipped);
+ * else anything necessary -> necessary; only all-rest (sleep) -> rest.
+ * Unknown (deleted) categories count as necessary.
  */
 export function blockKind(categoryIds: string[], kindOf: (id: string) => KindName | undefined): KindName {
-  const kinds = categoryIds.map(kindOf)
+  const kinds = categoryIds.map((id) => kindOf(id) ?? 'necessary')
   if (kinds.includes('productive')) return 'productive'
-  if (kinds.includes('neutral') || kinds.includes(undefined)) return 'neutral'
+  if (kinds.includes('unproductive')) return 'unproductive'
+  if (kinds.includes('necessary') || kinds.length === 0) return 'necessary'
   return 'rest'
 }
 
@@ -149,7 +153,7 @@ export function minutesByKind(
   entries: { minutes: number; categoryIds: string[] }[],
   kindOf: (id: string) => KindName | undefined,
 ): Record<KindName, number> {
-  const totals = { productive: 0, neutral: 0, rest: 0 }
+  const totals = { productive: 0, necessary: 0, unproductive: 0, rest: 0 }
   for (const e of entries) totals[blockKind(e.categoryIds, kindOf)] += e.minutes
   return totals
 }

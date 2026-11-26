@@ -9,7 +9,7 @@ import {
   startOfWeek,
 } from '../time'
 import { useToday } from '../useToday'
-import { KINDS, type Category, type Entry, type Kind } from '../types'
+import { KIND_LABEL, KINDS, type Category, type Entry } from '../types'
 
 interface Props {
   day: string
@@ -18,8 +18,6 @@ interface Props {
   entries: Entry[]
   openDay: (day: string) => void
 }
-
-const KIND_LABEL: Record<Kind, string> = { productive: 'Productive', neutral: 'Neutral', rest: 'Rest' }
 
 const hours = (m: number) => formatDuration(Math.round(m))
 const shortDay = (iso: string) => parseISODate(iso).toLocaleDateString(undefined, { weekday: 'short' })
@@ -51,10 +49,10 @@ export function WeekView({ day, setDay, categories, entries, openDay }: Props) {
   const perDay = days.map((d) => {
     const list = weekEntries.filter((e) => e.date === d)
     const kinds = minutesByKind(list, kindOf)
-    return { date: d, kinds, logged: kinds.productive + kinds.neutral + kinds.rest }
+    return { date: d, kinds, logged: KINDS.reduce((sum, k) => sum + kinds[k], 0) }
   })
   const totals = minutesByKind(weekEntries, kindOf)
-  const logged = totals.productive + totals.neutral + totals.rest
+  const logged = KINDS.reduce((sum, k) => sum + totals[k], 0)
   const daysLogged = perDay.filter((d) => d.logged > 0).length
 
   const perCategory = [...minutesByCategory(weekEntries)].sort((a, b) => b[1] - a[1])
@@ -86,6 +84,11 @@ export function WeekView({ day, setDay, categories, entries, openDay }: Props) {
           <span className="stat-label">Productive</span>
           <span className="stat-value">{hours(totals.productive)}</span>
           <span className="stat-sub">{logged ? `${Math.round((totals.productive / logged) * 100)}% of logged time` : '—'}</span>
+        </div>
+        <div className="stat">
+          <span className="stat-label">Unproductive</span>
+          <span className="stat-value">{hours(totals.unproductive)}</span>
+          <span className="stat-sub">{logged ? `${Math.round((totals.unproductive / logged) * 100)}% of logged time` : '—'}</span>
         </div>
         <div className="stat">
           <span className="stat-label">Logged</span>
@@ -144,7 +147,7 @@ export function WeekView({ day, setDay, categories, entries, openDay }: Props) {
                 aria-label={`${longDay(d.date)}: ${d.logged ? KINDS.map((k) => `${KIND_LABEL[k]} ${hours(d.kinds[k])}`).join(', ') : 'nothing logged'}`}
               >
                 <span className="week-track">
-                  {/* bottom to top: productive, neutral, rest */}
+                  {/* bottom to top: productive, necessary, unproductive, rest */}
                   {KINDS.map((k) =>
                     d.kinds[k] > 0 ? (
                       <span

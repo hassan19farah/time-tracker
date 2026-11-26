@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { BackupFile, MergePlan } from './backup'
 import { getAll, getMeta, putBatch, putMany, remove, replaceStores, requestPersistence, setMeta } from './db'
-import type { Category, Entry, Kind } from './types'
+import { normalizeKind, type Category, type Entry, type Kind } from './types'
 
 export interface TrackerData {
   categories: Category[]
@@ -25,13 +25,13 @@ const STARTER_CATEGORIES: [name: string, color: string, kind: Kind][] = [
   ['Study', '#0d9488', 'productive'],
   ['Projects', '#0284c7', 'productive'],
   ['Exercise', '#65a30d', 'productive'],
-  ['Meals', '#ea580c', 'neutral'],
-  ['Leisure', '#db2777', 'neutral'],
-  ['Family', '#e11d48', 'neutral'],
-  ['Social', '#9333ea', 'neutral'],
-  ['Travel', '#0891b2', 'neutral'],
-  ['Errands', '#78716c', 'neutral'],
-  ['Self-care', '#ca8a04', 'neutral'],
+  ['Meals', '#ea580c', 'necessary'],
+  ['Leisure', '#db2777', 'unproductive'],
+  ['Family', '#e11d48', 'necessary'],
+  ['Social', '#9333ea', 'unproductive'],
+  ['Travel', '#0891b2', 'necessary'],
+  ['Errands', '#78716c', 'necessary'],
+  ['Self-care', '#ca8a04', 'necessary'],
 ]
 
 function starterCategories(): Category[] {
@@ -52,7 +52,7 @@ async function loadData(): Promise<TrackerData> {
     getMeta<boolean>('seeded'),
     getMeta<string>('lastBackup'),
   ])
-  const categories = storedCategories.map((c) => ({ ...c, kind: c.kind ?? 'neutral' }))
+  const categories = storedCategories.map((c) => ({ ...c, kind: normalizeKind(c.kind) }))
   // Seed starter categories once only, so deleting them all doesn't bring them back.
   if (!seeded && categories.length === 0) {
     const starters = starterCategories()

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { newId } from '../store'
-import { KINDS, type Category, type Entry, type Kind } from '../types'
+import { KIND_LABEL, KINDS, type Category, type Entry, type Kind } from '../types'
 
 interface Props {
   categories: Category[]
@@ -41,7 +41,7 @@ export function CategoriesView({ categories, entries, onSave, onDelete }: Props)
         name: trimmed,
         color: NEW_COLORS[categories.length % NEW_COLORS.length],
         hidden: false,
-        kind: 'neutral',
+        kind: 'necessary',
         order: Math.max(-1, ...categories.map((c) => c.order)) + 1,
       })
       setName('')
@@ -52,8 +52,8 @@ export function CategoriesView({ categories, entries, onSave, onDelete }: Props)
     <section aria-label="Categories">
       <h2 className="section-title">Categories</h2>
       <p className="muted small">
-        “Counts as” decides productive hours: a block counts as productive if any of its activities is
-        productive. Hidden categories stay on past entries but aren’t offered for new ones. A category can only be
+        “Counts as” sorts your hours: a block is productive if anything in it was productive, otherwise
+        unproductive if anything was unproductive, otherwise necessary. Rest is for sleep. Hidden categories stay on past entries but aren’t offered for new ones. A category can only be
         deleted once no entries use it.
       </p>
 
@@ -150,7 +150,7 @@ function CategoryRow({ category, count, isDuplicate, onSave, onDelete, onError }
           >
             {KINDS.map((k) => (
               <option key={k} value={k}>
-                {k[0].toUpperCase() + k.slice(1)}
+                {KIND_LABEL[k]}
               </option>
             ))}
           </select>

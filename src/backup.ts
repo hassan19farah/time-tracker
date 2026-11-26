@@ -1,7 +1,7 @@
 // Backup files: a JSON copy of all categories and entries that can be imported again,
 // on this device or another one.
 import { MINUTES_PER_DAY, minutesBetween, parseTime } from './time'
-import { KINDS, type Category, type Entry, type Kind } from './types'
+import { normalizeKind, type Category, type Entry } from './types'
 
 export const BACKUP_APP = 'time-tracker'
 export const BACKUP_VERSION = 1
@@ -63,7 +63,7 @@ export function parseBackup(text: string): BackupFile {
       color: isString(c.color) && COLOR_RE.test(c.color) ? c.color : '#78716c',
       hidden: c.hidden === true,
       order: typeof c.order === 'number' && Number.isFinite(c.order) ? c.order : i,
-      kind: KINDS.includes(c.kind as Kind) ? (c.kind as Kind) : 'neutral',
+      kind: normalizeKind(c.kind),
     }
   })
   const categoryIds = new Set(categories.map((c) => c.id))
