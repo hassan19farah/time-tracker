@@ -30,4 +30,6 @@ Then open the address it prints, ending in `/time-tracker/`.
 
 ## Live link
 
-_Not published yet._
+https://hassan19farah.github.io/time-tracker/
+
+On your phone, open it in Chrome and choose **⋮ → Install app** (Safari: **Share → Add to Home Screen**).
