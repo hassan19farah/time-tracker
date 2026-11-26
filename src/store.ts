@@ -26,7 +26,7 @@ const STARTER_CATEGORIES: [name: string, color: string, kind: Kind][] = [
   ['Projects', '#0284c7', 'productive'],
   ['Exercise', '#65a30d', 'productive'],
   ['Meals', '#ea580c', 'neutral'],
-  ['Leisure', '#db2777', 'rest'],
+  ['Leisure', '#db2777', 'neutral'],
   ['Family', '#e11d48', 'neutral'],
   ['Social', '#9333ea', 'neutral'],
   ['Travel', '#0891b2', 'neutral'],
